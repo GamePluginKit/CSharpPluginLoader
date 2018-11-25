@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net35</TargetFramework>
+    <FrameworkPathOverride>$(UnityEditorDir)\Data\Mono\lib\mono\unity</FrameworkPathOverride>
+    <GenerateTargetFrameworkAttribute>False</GenerateTargetFrameworkAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GamePluginKit.API" Version="*" />
+    <Reference Include="UnityEngine" Private="False">
+      <HintPath>$(UnityEditorDir)\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
