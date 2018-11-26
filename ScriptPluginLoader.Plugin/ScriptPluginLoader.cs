@@ -92,7 +92,7 @@ class ScriptPluginLoader : MonoBehaviour
             // no action to start a "new" compilation. We just
             // immediately start setting things up.
 
-            // Preprocessor symbols should be the set up first.
+            // Preprocessor symbols should be set up first.
             foreach (var symbol in new[]
                 {
                     "UNITY_STANDALONE"
