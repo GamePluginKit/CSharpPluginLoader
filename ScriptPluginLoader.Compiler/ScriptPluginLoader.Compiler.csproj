@@ -4,7 +4,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net471</TargetFramework>
-    <OutputPath>$(OutputPath)Tools\</OutputPath>
+    <OutputPath>$(OutputPath)Tools\Compiler\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

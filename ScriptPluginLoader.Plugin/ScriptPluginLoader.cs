@@ -221,7 +221,7 @@ class ScriptPluginLoader : MonoBehaviour
 
     Process GetCompilerProcess()
     {
-        var cscPath = Path.Combine(ToolsPath, CompilerExe);
+        var cscPath = Path.Combine(Path.Combine(ToolsPath, "Compiler"), CompilerExe);
         var process = new Process
         {
             StartInfo = new ProcessStartInfo

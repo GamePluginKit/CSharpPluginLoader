@@ -9,6 +9,6 @@
     <AssemblyOriginatorKeyFile>mscorlib.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>True</SignAssembly>
     <DelaySign>True</DelaySign>
-    <OutputPath>$(OutputPath)Tools\MicroForwarder\</OutputPath>
+    <OutputPath>$(OutputPath)Tools\Compiler\MicroForwarder\</OutputPath>
   </PropertyGroup>
 </Project>
