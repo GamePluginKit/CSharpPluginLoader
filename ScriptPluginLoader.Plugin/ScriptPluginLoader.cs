@@ -182,6 +182,7 @@ class ScriptPluginLoader : MonoBehaviour
             {
                 RedirectStandardInput  = true,
                 RedirectStandardOutput = true,
+                CreateNoWindow         = true,
                 UseShellExecute        = false
             }
         };
