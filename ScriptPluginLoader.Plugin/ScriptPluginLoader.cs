@@ -102,11 +102,73 @@ class ScriptPluginLoader : MonoBehaviour
                 bw.Write(symbol);
             }
 
+            bw.Write((int)CompilerAction.AddPreprocessorSymbol);
+            switch (Application.platform)
+            {
+            case RuntimePlatform.WindowsPlayer:
+                bw.Write("UNITY_STANDALONE_WIN");
+                break;
+            case RuntimePlatform.LinuxPlayer:
+                bw.Write("UNITY_STANDALONE_LINUX");
+                break;
+            case RuntimePlatform.OSXPlayer:
+                bw.Write("UNITY_STANDALONE_OSX");
+                break;
+            default:
+                bw.Write("UNITY_STANDALONE_UNKNOWN");
+                break;
+            }
+
+            if (Debug.isDebugBuild)
+            {
+                bw.Write((int)CompilerAction.AddPreprocessorSymbol);
+                bw.Write("DEVELOPMENT_BUILD");
+            }
+
+            // Create UNITY_X, UNITY_X_Y and UNITY_X_Y_Z symbol
+            var split = Application.unityVersion.Split('.', 'b', 'f', 'p');
+
+            for (int n = 1; n <= Mathf.Min(split.Length, 3); n++)
+            {
+                bw.Write((int)CompilerAction.AddPreprocessorSymbol);
+                bw.Write($"UNITY_" + string.Join("_", split.Take(n).ToArray()));
+            }
+
+            // Create UNITY_X_Y_OR_NEWER symbols
+            var current = new Version(
+                int.Parse(split.Length > 0 ? split[0] : "0"),
+                int.Parse(split.Length > 1 ? split[1] : "0"),
+                int.Parse(split.Length > 2 ? split[2] : "0"),
+                int.Parse(split.Length > 3 ? split[3] : "0")
+            );
+
+            AddOrNewerSymbols(5, 3, 6);
+            AddOrNewerSymbols(2017);
+            AddOrNewerSymbols(2018);
+            AddOrNewerSymbols(2019);
+
+            void AddOrNewerSymbols(int major, int minorStart = 1, int minorEnd = 9)
+            {
+                for (int i = minorStart; i <= minorEnd; i++)
+                {
+                    var version = new Version(major, i);
+
+                    if (version > current) continue;
+
+                    bw.Write((int)CompilerAction.AddPreprocessorSymbol);
+                    bw.Write($"UNITY_{major}_{i}_OR_NEWER");
+                }
+            }
+
             // Older Unity games that use the "micro" mscorlib
             // can cause problems. The compiler has special handling
             // for these games through a special type forwarding assembly.
             if (GetPublicKeyToken(typeof(object).Assembly) == "7cec85d7bea7798e")
+            {
                 bw.Write((int)CompilerAction.EnableMicro);
+                bw.Write((int)CompilerAction.AddPreprocessorSymbol);
+                bw.Write("MICRO_MSCORLIB_BUILD");
+            }
 
             string GetPublicKeyToken(Assembly assembly)
             {
