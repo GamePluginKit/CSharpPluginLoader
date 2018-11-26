@@ -1,12 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\Common.props" />
+
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFramework>net35</TargetFramework>
     <FrameworkPathOverride>$(UnityEditorDir)\Data\Mono\lib\mono\unity</FrameworkPathOverride>
     <GenerateTargetFrameworkAttribute>False</GenerateTargetFrameworkAttribute>
+    <OutputPath>$(OutputPath)Plugins\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\ScriptPluginLoader.Common\**\*.cs" />
     <PackageReference Include="GamePluginKit.API" Version="*" />
     <Reference Include="UnityEngine" Private="False">
       <HintPath>$(UnityEditorDir)\Data\Managed\UnityEngine.dll</HintPath>

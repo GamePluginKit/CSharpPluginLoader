@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\Common.props" />
+
+  <PropertyGroup>
+    <AssemblyName>mscorlib</AssemblyName>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <TargetFramework>net35</TargetFramework>
+    <FrameworkPathOverride>$(UnityEditorDir)\Data\Mono\lib\mono\micro</FrameworkPathOverride>
+    <AssemblyOriginatorKeyFile>mscorlib.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>True</SignAssembly>
+    <DelaySign>True</DelaySign>
+    <OutputPath>$(OutputPath)Tools\MicroForwarder\</OutputPath>
+  </PropertyGroup>
+</Project>

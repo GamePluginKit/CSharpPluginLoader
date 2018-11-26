@@ -14,102 +14,117 @@
 
 using System;
 using System.IO;
+using System.Reflection;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 
 class Program
 {
     static void Main(string[] args)
     {
-        using (var input  = new StreamReader(Console.OpenStandardInput()))
-        using (var output = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true })
+        // Register all of the compiler methods
+        var actions = new Dictionary<CompilerAction, Action<CompilerContext>>();
+
+        foreach (var method in typeof(Program).GetMethods(BindingFlags.Static | BindingFlags.NonPublic))
         {
-            var dataPath = string.Empty;
-            var trees    = new List<SyntaxTree>();
-            var defines  = new List<string>();
+            var attr = method.GetCustomAttribute<CompilerMethodAttribute>();
+
+            if (attr == null) continue;
+
+            actions.Add(attr.Action, (Action<CompilerContext>)method.CreateDelegate(typeof(Action<CompilerContext>)));
+        }
+
+        using (var br = new BinaryReader(Console.OpenStandardInput()))
+        using (var bw = new BinaryWriter(Console.OpenStandardOutput()))
+        {
+            // Create the compilation and begin listening for actions
+            var ctx = new CompilerContext(br, bw)
+            {
+                Compilation = CSharpCompilation.Create("ScriptPluginAssembly")
+                    .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                    .WithAllowUnsafe(true)
+                    .WithOptimizationLevel(OptimizationLevel.Release)),
+
+                ParseOptions = CSharpParseOptions.Default
+                    .WithKind(SourceCodeKind.Regular)
+                    .WithLanguageVersion(LanguageVersion.Latest),
+            };
 
             while (true)
             {
-                switch (input.ReadLine())
+                var action = (CompilerAction)br.ReadInt32();
+
+                if (actions.TryGetValue(action, out var method))
                 {
-                case "AddDefine":
-                    defines.Add(input.ReadLine());
-                    break;
-                case "SetDataPath":
-                    dataPath = input.ReadLine();
-                    break;
-                case "AddSourceFile":
-                    AddSourceFile(input.ReadLine());
-                    break;
-                case "Compile":
-                    Compile();
-                    break;
-                case "Finish":
+                    method(ctx);
+                }
+
+                if (action == CompilerAction.Finish)
                     return;
-                }
-            }
-
-            void Compile()
-            {
-                var references = new List<MetadataReference>();
-                var managedDir = Path.Combine(dataPath, "Managed");
-                var modsDir    = Path.Combine(dataPath, "Mods");
-                var gpkDir     = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "GamePluginKit");
-                var pluginsDir = Path.Combine(gpkDir, "Plugins");
-                var coreDir    = Path.Combine(gpkDir, "Core");
-
-                // Create references for all assemblies
-                AddReferences(managedDir);
-                AddReferences(pluginsDir);
-                AddReferences(modsDir);
-                AddReferences(coreDir);
-
-                var outputPath = Path.GetTempFileName();
-                var options = new CSharpCompilationOptions(
-                    outputKind: OutputKind.DynamicallyLinkedLibrary,
-                    optimizationLevel: OptimizationLevel.Release,
-                    allowUnsafe: true
-                );
-
-                var compilation = CSharpCompilation.Create("ScriptAssembly", trees, references, options);
-                var result      = compilation.Emit(outputPath);
-
-                output.WriteLine(result.Success);
-
-                if (result.Success)
-                    output.WriteLine(outputPath);
-                else
-                {
-                    // todo: maybe send a JSON-ified version of the diagnostics
-                    // I dunno, this needs work, it's far too basic right now.
-
-                    output.WriteLine(result.Diagnostics.Length);
-
-                    foreach (var diagnostic in result.Diagnostics)
-                        output.WriteLine(diagnostic.GetMessage());
-                }
-
-                void AddReferences(string directory, SearchOption searchOption = SearchOption.TopDirectoryOnly)
-                {
-                    foreach (string file in Directory.EnumerateFiles(directory, "*.dll", searchOption))
-                    {
-                        references.Add(MetadataReference.CreateFromFile(file));
-                    }
-                }
-            }
-
-            void AddSourceFile(string filePath)
-            {
-                var options = CSharpParseOptions.Default
-                    .WithLanguageVersion(LanguageVersion.Latest)
-                    .WithPreprocessorSymbols(defines);
-
-                var text = File.ReadAllText(filePath);
-                var tree = CSharpSyntaxTree.ParseText(text, options);
-
-                trees.Add(tree);
             }
         }
+    }
+
+    [CompilerMethod(CompilerAction.AddPreprocessorSymbol)]
+    static void AddDefine(CompilerContext ctx)
+    {
+        var define       = ctx.Reader.ReadString();
+        var symbols      = new List<string>(ctx.ParseOptions.PreprocessorSymbolNames) { define };
+        ctx.ParseOptions = ctx.ParseOptions.WithPreprocessorSymbols(symbols);
+    }
+
+    [CompilerMethod(CompilerAction.AddSourceFile)]
+    static void AddSourceFile(CompilerContext ctx)
+    {
+        string path = ctx.Reader.ReadString();
+        string text = File.ReadAllText(path);
+
+        var syntaxTree  = CSharpSyntaxTree.ParseText(text, ctx.ParseOptions);
+        ctx.Compilation = ctx.Compilation.AddSyntaxTrees(syntaxTree);
+    }
+
+    [CompilerMethod(CompilerAction.AddReference)]
+    static void AddReference(CompilerContext ctx)
+    {
+        string path     = ctx.Reader.ReadString();
+        var reference   = MetadataReference.CreateFromFile(path);
+        ctx.Compilation = ctx.Compilation.AddReferences(reference);
+    }
+
+    [CompilerMethod(CompilerAction.EnableMicro)]
+    static void EnableMicro(CompilerContext ctx)
+    {
+        var rootPath    = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        string path     = Path.Combine(rootPath, Path.Combine("MicroForwarder", "mscorlib.dll"));
+        var reference   = MetadataReference.CreateFromFile(path);
+        ctx.Compilation = ctx.Compilation.AddReferences(reference);
+    }
+
+    [CompilerMethod(CompilerAction.Compile)]
+    static void Compile(CompilerContext ctx)
+    {
+        var ms     = new MemoryStream();
+        var result = ctx.Compilation.Emit(ms, options: new EmitOptions()
+            .WithIncludePrivateMembers(true)
+            .WithTolerateErrors(true));
+
+        ctx.Writer.Write(result.Success);
+
+        if (result.Success)
+        {
+            ctx.Writer.Write((int)ms.Length);
+            ctx.Writer.Write(ms.ToArray());
+        }
+        else
+        {
+            ctx.Writer.Write(result.Diagnostics.Length);
+
+            foreach (var diag in result.Diagnostics)
+                ctx.Writer.Write(diag.GetMessage());
+        }
+
+        ctx.Writer.Flush();
     }
 }
