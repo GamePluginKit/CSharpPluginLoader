@@ -22,6 +22,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 using GamePluginKit;
+using static GamePluginKit.GpkEnvironment;
 using Debug = UnityEngine.Debug;
 
 // This plugin allows you to provide .cs source files,
@@ -39,30 +40,13 @@ class ScriptPluginLoader : MonoBehaviour
 {
     const string CompilerExe = "ScriptPluginLoader.Compiler.exe";
 
-    // GPK's root is defined as <LocalAppData>/GamePluginKit/,
-    // or wherever Mono remaps that path to on your system.
-    static readonly string GpkDir = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "GamePluginKit"
-    );
-
-    static readonly string CoreDir = Path.Combine(GpkDir, "Core");
-
-    static readonly string PluginsDir = Path.Combine(GpkDir, "Plugins");
-
-    static readonly string ToolsDir = Path.Combine(GpkDir, "Tools");
-
-    static readonly string ModsDir = Path.Combine(Application.dataPath, "Mods");
-
-    static readonly string ManagedDir = Path.Combine(Application.dataPath, "Managed");
-
     void Awake()
     {
         // Recursively search for .cs source files in the game-
         // specific mod folder, and the global plugins folder.
         var files = new List<string>();
-        files.AddRange(Directory.GetFiles(ModsDir,    "*.cs", SearchOption.AllDirectories));
-        files.AddRange(Directory.GetFiles(PluginsDir, "*.cs", SearchOption.AllDirectories));
+        files.AddRange(Directory.GetFiles(ModsPath,    "*.cs", SearchOption.AllDirectories));
+        files.AddRange(Directory.GetFiles(PluginsPath, "*.cs", SearchOption.AllDirectories));
 
         var plugin = Compile(files);
         var attrs  = plugin.GetCustomAttributes(typeof(StartupBehaviourAttribute), false);
@@ -187,10 +171,10 @@ class ScriptPluginLoader : MonoBehaviour
             }
 
             var references = new List<string>();
-            references.AddRange(Directory.GetFiles(CoreDir,    "*.dll", SearchOption.AllDirectories));
-            references.AddRange(Directory.GetFiles(PluginsDir, "*.dll", SearchOption.AllDirectories));
-            references.AddRange(Directory.GetFiles(ModsDir,    "*.dll", SearchOption.AllDirectories));
-            references.AddRange(Directory.GetFiles(ManagedDir, "*.dll", SearchOption.AllDirectories));
+            references.AddRange(Directory.GetFiles(CorePath,    "*.dll", SearchOption.AllDirectories));
+            references.AddRange(Directory.GetFiles(PluginsPath, "*.dll", SearchOption.AllDirectories));
+            references.AddRange(Directory.GetFiles(ModsPath,    "*.dll", SearchOption.AllDirectories));
+            references.AddRange(Directory.GetFiles(ManagedPath, "*.dll", SearchOption.AllDirectories));
 
             foreach (string path in references)
             {
@@ -237,7 +221,7 @@ class ScriptPluginLoader : MonoBehaviour
 
     Process GetCompilerProcess()
     {
-        var cscPath = Path.Combine(ToolsDir, CompilerExe);
+        var cscPath = Path.Combine(ToolsPath, CompilerExe);
         var process = new Process
         {
             StartInfo = new ProcessStartInfo

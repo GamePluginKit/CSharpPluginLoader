@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <Compile Include="..\ScriptPluginLoader.Common\**\*.cs" />
-    <PackageReference Include="GamePluginKit.API" Version="*" />
+    <PackageReference Include="GamePluginKit.API" Version="2.1.0" />
     <Reference Include="UnityEngine" Private="False">
       <HintPath>$(UnityEditorDir)\Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
