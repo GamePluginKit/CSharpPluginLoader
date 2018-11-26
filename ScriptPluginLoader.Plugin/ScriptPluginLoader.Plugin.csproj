@@ -2,6 +2,7 @@
   <Import Project="..\Common.props" />
 
   <PropertyGroup>
+    <AssemblyName>ScriptPluginLoader</AssemblyName>
     <OutputType>Library</OutputType>
     <TargetFramework>net35</TargetFramework>
     <FrameworkPathOverride>$(UnityEditorDir)\Data\Mono\lib\mono\unity</FrameworkPathOverride>
