@@ -105,10 +105,10 @@ class ScriptPluginLoader : MonoBehaviour
             // Older Unity games that use the "micro" mscorlib
             // can cause problems. The compiler has special handling
             // for these games through a special type forwarding assembly.
-            if (GetPublicKey(typeof(object).Assembly) == "7cec85d7bea7798e")
+            if (GetPublicKeyToken(typeof(object).Assembly) == "7cec85d7bea7798e")
                 bw.Write((int)CompilerAction.EnableMicro);
 
-            string GetPublicKey(Assembly assembly)
+            string GetPublicKeyToken(Assembly assembly)
             {
                 var bytes = assembly.GetName().GetPublicKeyToken();
 
