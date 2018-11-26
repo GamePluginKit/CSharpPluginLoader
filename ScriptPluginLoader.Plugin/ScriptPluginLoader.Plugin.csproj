@@ -6,7 +6,7 @@
     <TargetFramework>net35</TargetFramework>
     <FrameworkPathOverride>$(UnityEditorDir)\Data\Mono\lib\mono\unity</FrameworkPathOverride>
     <GenerateTargetFrameworkAttribute>False</GenerateTargetFrameworkAttribute>
-    <OutputPath>$(OutputPath)Plugins\</OutputPath>
+    <OutputPath>$(OutputPath)Core\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
