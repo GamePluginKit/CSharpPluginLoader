@@ -253,31 +253,35 @@ class ScriptPluginLoader : MonoBehaviour
 
         string NonWindowsEscape(params string[] arguments)
         {
-            var escapeChars = new[]
-            {
-                '\u0060', '\u007e', '\u0021', '\u0023',
-                '\u0024', '\u0026', '\u002a', '\u0028',
-                '\u0029', '\u0009', '\u007b', '\u005b',
-                '\u007c', '\u005c', '\u003b', '\u0027',
-                '\u0022', '\u000a', '\u003c', '\u003e',
-                '\u003f', '\u0020', '\u003d'
-            };
-
             var sb = new StringBuilder();
 
-            foreach (string arg in arguments)
+            for (int i = 0; i < arguments.Length; i++)
             {
+                if (i > 0)
+                    sb.Append(' ');
+
                 sb.Append('"');
 
-                foreach (char c in arg)
+                foreach (char c in arguments[i])
                 {
-                    if (escapeChars.Contains(c))
+                    switch (c)
+                    {
+                    case '\u0060': case '\u007e': case '\u0021':
+                    case '\u0023': case '\u0024': case '\u0026':
+                    case '\u002a': case '\u0028': case '\u0029':
+                    case '\u0009': case '\u007b': case '\u005b':
+                    case '\u007c': case '\u005c': case '\u003b':
+                    case '\u0027': case '\u0022': case '\u000a':
+                    case '\u003c': case '\u003e': case '\u003f':
+                    case '\u0020': case '\u003d':
                         sb.Append('\\');
+                        break;
+                    }
+
                     sb.Append(c);
                 }
 
                 sb.Append('"');
-                sb.Append(' ');
             }
 
             return sb.ToString();
