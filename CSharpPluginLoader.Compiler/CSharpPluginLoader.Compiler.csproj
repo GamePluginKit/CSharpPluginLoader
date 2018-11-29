@@ -4,11 +4,11 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net471</TargetFramework>
-    <OutputPath>$(OutputPath)Tools\Compiler\</OutputPath>
+    <OutputPath>$(OutputPath)Tools\CSCompiler\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\ScriptPluginLoader.Common\**\*.cs" />
+    <Compile Include="..\CSharpPluginLoader.Common\**\*.cs" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
   </ItemGroup>
 </Project>

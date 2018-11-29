@@ -34,11 +34,11 @@ using Debug = UnityEngine.Debug;
 // The plugin makes use of an external compiler application
 // that communicates with the game via stdin and stdout.
 
-[assembly: StartupBehaviour(typeof(ScriptPluginLoader))]
+[assembly: StartupBehaviour(typeof(CSharpPluginLoader))]
 
-class ScriptPluginLoader : MonoBehaviour
+class CSharpPluginLoader : MonoBehaviour
 {
-    const string CompilerExe = "ScriptPluginLoader.Compiler.exe";
+    const string CompilerExe = "CSharpPluginLoader.Compiler.exe";
 
     void Awake()
     {
@@ -221,7 +221,7 @@ class ScriptPluginLoader : MonoBehaviour
 
     Process GetCompilerProcess()
     {
-        var cscPath = Path.Combine(Path.Combine(ToolsPath, "Compiler"), CompilerExe);
+        var cscPath = Path.Combine(Path.Combine(ToolsPath, "CSCompiler"), CompilerExe);
         var process = new Process
         {
             StartInfo = new ProcessStartInfo

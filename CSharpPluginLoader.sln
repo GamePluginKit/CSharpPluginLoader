@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptPluginLoader.Compiler", "ScriptPluginLoader.Compiler\ScriptPluginLoader.Compiler.csproj", "{3FC3C49C-8EE5-43E7-BE18-C6A0ACF3BB07}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpPluginLoader.Compiler", "CSharpPluginLoader.Compiler\CSharpPluginLoader.Compiler.csproj", "{3FC3C49C-8EE5-43E7-BE18-C6A0ACF3BB07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptPluginLoader.Plugin", "ScriptPluginLoader.Plugin\ScriptPluginLoader.Plugin.csproj", "{8C00FAD9-8AE3-4DD5-A128-E6429E9AE386}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpPluginLoader.Plugin", "CSharpPluginLoader.Plugin\CSharpPluginLoader.Plugin.csproj", "{8C00FAD9-8AE3-4DD5-A128-E6429E9AE386}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptPluginLoader.MicroForwarder", "ScriptPluginLoader.MicroForwarder\ScriptPluginLoader.MicroForwarder.csproj", "{69A96820-2B51-45E0-A1D4-974FE8011681}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpPluginLoader.MicroForwarder", "CSharpPluginLoader.MicroForwarder\CSharpPluginLoader.MicroForwarder.csproj", "{69A96820-2B51-45E0-A1D4-974FE8011681}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
